@@ -1,0 +1,21 @@
+# Requirements for the NLP project
+# Core data analysis libraries  
+pandas
+matplotlib
+seaborn
+scikit-learn
+nltk
+spacy
+jupyter
+pytest
+
+# NLP and text processing  
+nltk>=3.7  
+scikit-learn>=1.0  
+
+# Testing framework  
+pytest>=7.0  
+
+# Optional: For advanced NLP or visualization enhancements  
+spaCy>=3.5.0  
+plotly>=5.0.0  
