@@ -1,54 +1,107 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
+import nltk
+import string
+import re
+from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
 
-# 🔹 Load dataset
-print("🔹 Loading Dataset")
-df = pd.read_csv(r'c:\10 Kifia Tasks\data\raw_analyst_ratings.csv')
+# ---------------------- NLTK Setup ---------------------- #
+custom_nltk_data_path = r"C:/10 Kifia Tasks/Week-1/financial-news-stock-analysis/notebooks/nltk_data"
+nltk.data.path.append(custom_nltk_data_path)
 
-# 🔹 Convert Date Column for Analysis (with improved error handling)
-df['date'] = pd.to_datetime(df['date'], errors='coerce', format='%Y-%m-%d %H:%M:%S')
+nltk.download("punkt", download_dir=custom_nltk_data_path)
+nltk.download("stopwords", download_dir=custom_nltk_data_path)
 
-# 🔹 Check for NaT values and warn if necessary
-missing_dates = df[df['date'].isna()]
-if not missing_dates.empty:
-    print("\n⚠️ Warning: Some rows contain invalid date formats. Review these:")
-    print(missing_dates.head())
+stop_words = set(stopwords.words("english"))
+financial_terms = ["FDA approval", "price target", "merger", "downgrade", "earnings", "guidance", "valuation", "buyout"]
+punctuation_regex = re.compile(r"[{}]".format(re.escape(string.punctuation)))  # Precompiled regex for punctuation removal
 
-# 🔹 Headline Length Statistics
-print("\n🔹 Headline Length Statistics")
-df['headline_length'] = df['headline'].astype(str).str.len()
-print(df['headline_length'].describe())
+# ---------------------- Load Data ---------------------- #
+df = pd.read_csv(r'C:/10 Kifia Tasks/data/raw_analyst_ratings.csv')
 
-# 🔹 Count Articles Per Publisher (Corrected from 'publication' to 'publisher')
-print("\n🔹 Top Publishers")
-publisher_counts = df['publisher'].value_counts()
-print(publisher_counts.head(10))
+### ---------------------- STEP 1: DESCRIPTIVE STATISTICS ---------------------- ###
 
-# 🔹 Analyze Publication Trends Over Time
-print("\n🔹 Daily Publication Counts")
-daily_counts = df.resample('D', on='date').size()
-print(daily_counts.head())
+# Headline Length Analysis
+df["headline_length"] = df["headline"].astype(str).apply(len)
+print("Headline Length Stats:\n", df["headline_length"].describe())
 
-# 🔹 Visualization of Publication Trends
-print("\n🔹 Generating Visualization")
-
-plt.style.use('ggplot')
-fig, ax = plt.subplots(figsize=(12,6))
-
-# Plot Publication Trends with a Trend Line
-daily_counts.plot(ax=ax, color='royalblue', linewidth=2, label="Daily Counts")
-daily_counts.rolling(window=7).mean().plot(ax=ax, linestyle="--", linewidth=2, color="darkred", label="7-day Avg")
-
-# Formatting Graph
-ax.set_title('Articles Published Over Time', fontsize=14, fontweight='bold')
-ax.set_xlabel('Date', fontsize=12)
-ax.set_ylabel('Count', fontsize=12)
-ax.legend()
-ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
-plt.xticks(rotation=45)
-
+plt.hist(df["headline_length"], bins=30, edgecolor='black')
+plt.xlabel("Headline Length (characters)")
+plt.ylabel("Frequency")
+plt.title("Headline Length Distribution")
 plt.show()
+
+# Publisher Analysis
+publisher_counts = df["publisher"].value_counts()
+print("Articles Per Publisher:\n", publisher_counts)
+
+plt.bar(publisher_counts.index[:10], publisher_counts[:10])
+plt.xlabel("Publisher")
+plt.ylabel("Number of Articles")
+plt.title("Top 10 Publishers")
+plt.xticks(rotation=45)
+plt.show()
+
+# Date Trend Analysis
+df["date"] = pd.to_datetime(df["date"], errors="coerce")
+df.dropna(subset=["date"], inplace=True)
+df["year_month"] = df["date"].dt.to_period("M")
+
+date_counts = df["year_month"].value_counts().sort_index()
+print("Date Trends:\n", date_counts)
+
+plt.plot(date_counts.index.astype(str), date_counts.values, marker='o')
+plt.xlabel("Year-Month")
+plt.ylabel("Number of Articles")
+plt.title("Publication Trends Over Time")
+plt.grid(True)
+plt.show()
+
+### ---------------------- STEP 2: TEXT ANALYSIS (Topic Modeling with Financial Terms) ---------------------- ###
+
+# Custom Financial Keyword Extraction
+def extract_financial_keywords(text):
+    text = text.lower()
+    keywords = [term for term in financial_terms if term in text]
+    return " ".join(keywords) if keywords else text  # Keep raw text if no keywords are found
+
+df["filtered_headline"] = df["headline"].astype(str).apply(extract_financial_keywords)
+
+# TF-IDF Vectorization (Focus on Financial Terms)
+vectorizer = TfidfVectorizer(max_features=500)
+tfidf_matrix = vectorizer.fit_transform(df["filtered_headline"])
+
+# LDA Model with Optimized Parameters
+lda_model = LatentDirichletAllocation(n_components=3, max_iter=5, verbose=1, random_state=42)
+lda_model.fit(tfidf_matrix)
+
+# Debugging step: Confirm LDA topics extracted
+print(f"✅ Number of topics extracted: {lda_model.n_components}")
+
+# Display Top Words per Topic
+def display_topics(model, feature_names, num_words):
+    print("✅ Entering topic display function...")  
+    
+    for topic_idx, topic in enumerate(model.components_):
+        top_words = [feature_names[i] for i in topic.argsort()[:-num_words - 1:-1]]
+        print(f"✅ Topic {topic_idx + 1}: {', '.join(top_words)}")  
+
+print("✅ Running Financial Topic Modeling Analysis...")
+display_topics(lda_model, vectorizer.get_feature_names_out(), 10)
+
+
+ 
+
+
+
+
+
+
+
+
+
 
 
 
