@@ -121,4 +121,66 @@ print(f"\nMost frequent publisher domains:\n{domain_counts.head(10)}")
 print(f"\nTop topics:\n")
 display_topics(lda, vectorizer.get_feature_names_out(), 10)
 
+# ------------------ Stock Price Analysis ------------------
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ✅ Load Multiple Stock Price Datasets
+csv_files = [
+    r"c:\10 Kifia Tasks\yfinance_data\AAPL_historical_data.csv",
+    r"c:\10 Kifia Tasks\yfinance_data\AMZN_historical_data.csv",
+    r"c:\10 Kifia Tasks\yfinance_data\GOOG_historical_data.csv",
+    r"c:\10 Kifia Tasks\yfinance_data\META_historical_data.csv",
+    r"c:\10 Kifia Tasks\yfinance_data\MSFT_historical_data.csv",
+    r"c:\10 Kifia Tasks\yfinance_data\NVDA_historical_data.csv",
+    r"c:\10 Kifia Tasks\yfinance_data\TSLA_historical_data.csv"
+]
+
+stock_data = {}
+for file in csv_files:
+    stock_name = file.split("\\")[-1].split("_")[0]  # Extract stock ticker
+    stock_data[stock_name] = pd.read_csv(file, parse_dates=["Date"], index_col="Date")
+
+print(stock_data["AAPL", "AMZN", "GOOG", "META", "MSFT", "NVDA", "TSLA"]:.head())
+print("🚀 Stock datasets loaded successfully!")
+
+# ✅ Compute Financial Metrics Without TA-Lib
+for stock in stock_data:
+    stock_data[stock]["SMA_50"] = stock_data[stock]["Close"].rolling(window=50).mean()
+    stock_data[stock]["SMA_200"] = stock_data[stock]["Close"].rolling(window=200).mean()
+
+    stock_data[stock]["Price Change"] = stock_data[stock]["Close"].diff()
+    stock_data[stock]["Gain"] = np.where(stock_data[stock]["Price Change"] > 0, stock_data[stock]["Price Change"], 0)
+    stock_data[stock]["Loss"] = np.where(stock_data[stock]["Price Change"] < 0, abs(stock_data[stock]["Price Change"]), 0)
+    stock_data[stock]["Avg Gain"] = stock_data[stock]["Gain"].rolling(window=14).mean()
+    stock_data[stock]["Avg Loss"] = stock_data[stock]["Loss"].rolling(window=14).mean()
+    stock_data[stock]["RS"] = stock_data[stock]["Avg Gain"] / stock_data[stock]["Avg Loss"]
+    stock_data[stock]["RSI"] = 100 - (100 / (1 + stock_data[stock]["RS"]))
+
+    stock_data[stock]["EMA_12"] = stock_data[stock]["Close"].ewm(span=12, adjust=False).mean()
+    stock_data[stock]["EMA_26"] = stock_data[stock]["Close"].ewm(span=26, adjust=False).mean()
+    stock_data[stock]["MACD"] = stock_data[stock]["EMA_12"] - stock_data[stock]["EMA_26"]
+    stock_data[stock]["MACD_Signal"] = stock_data[stock]["MACD"].ewm(span=9, adjust=False).mean()
+
+print("🚀 Financial indicators computed successfully!")
+
+# ✅ Visualize Stock Trends for Each Stock
+stocks = ["AAPL", "AMZN", "GOOG", "META", "MSFT", "NVDA", "TSLA"]
+
+for stock in stocks:
+    plt.figure(figsize=(12, 6))
+    plt.plot(stock_data[stock].index, stock_data[stock]["Close"], label="Stock Close Price", color="black", linewidth=2)
+    plt.plot(stock_data[stock].index, stock_data[stock]["SMA_50"], label="50-Day SMA", color="blue", linestyle="--", linewidth=2)
+    plt.plot(stock_data[stock].index, stock_data[stock]["SMA_200"], label="200-Day SMA", color="red", linestyle=":", linewidth=2)
+
+    plt.xlabel("Date", fontsize=12)
+    plt.ylabel("Stock Price", fontsize=12)
+    plt.title(f"{stock} Stock Price & Indicators", fontsize=14, fontweight="bold")
+    plt.legend(loc="upper left", fontsize=10)
+    plt.grid(True, linestyle="--", alpha=0.5)
+
+    plt.show()
+
+
 
