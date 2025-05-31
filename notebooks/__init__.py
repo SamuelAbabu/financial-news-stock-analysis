@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import nltk
 import string
 import re
+from urllib.parse import urlparse
+from collections import Counter
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
@@ -116,6 +118,29 @@ plt.title("Daily Publishing Frequency Over Time")
 plt.xticks(rotation=45)
 plt.grid()
 plt.show()
+
+### ---------------------- STEP 4: PUBLISHER ANALYSIS ---------------------- ###
+
+# Extract Domain Names from Publisher Emails (if applicable)
+def extract_domain(email):
+    if "@" in str(email):
+        return email.split("@")[-1]  # Extract domain after "@"
+    return "Unknown"
+
+df["publisher_domain"] = df["publisher"].apply(extract_domain)
+
+# Count Unique Domains
+domain_counts = df["publisher_domain"].value_counts()
+print("Publisher Domain Distribution:\n", domain_counts)
+
+plt.figure(figsize=(10, 5))
+domain_counts[:10].plot(kind="bar", color="skyblue")
+plt.xlabel("Publisher Domain")
+plt.ylabel("Number of Articles")
+plt.title("Top 10 Publishing Domains")
+plt.xticks(rotation=45)
+plt.show()
+
 
 
  
