@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import nltk
 import string
 import re
+from urllib.parse import urlparse
+from collections import Counter
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
@@ -77,7 +79,6 @@ tfidf_matrix = vectorizer.fit_transform(df["filtered_headline"])
 lda_model = LatentDirichletAllocation(n_components=3, max_iter=5, verbose=1, random_state=42)
 lda_model.fit(tfidf_matrix)
 
-# Debugging step: Confirm LDA topics extracted
 print(f"✅ Number of topics extracted: {lda_model.n_components}")
 
 # Display Top Words per Topic
@@ -90,6 +91,56 @@ def display_topics(model, feature_names, num_words):
 
 print("✅ Running Financial Topic Modeling Analysis...")
 display_topics(lda_model, vectorizer.get_feature_names_out(), 10)
+
+### ---------------------- STEP 3: TIME SERIES ANALYSIS (Publishing Trends) ---------------------- ###
+
+# Extract Hourly & Daily Publishing Patterns
+df["hour"] = df["date"].dt.hour
+df["day"] = df["date"].dt.date
+
+# Publishing Frequency Per Hour
+hourly_counts = df["hour"].value_counts().sort_index()
+plt.figure(figsize=(10, 5))
+plt.plot(hourly_counts.index, hourly_counts.values, marker="o")
+plt.xlabel("Hour of the Day")
+plt.ylabel("Number of Articles")
+plt.title("Publishing Frequency Across Hours")
+plt.grid()
+plt.show()
+
+# Publishing Frequency Over Time
+daily_counts = df["day"].value_counts().sort_index()
+plt.figure(figsize=(12, 6))
+plt.plot(daily_counts.index, daily_counts.values, marker="o", linestyle="-")
+plt.xlabel("Date")
+plt.ylabel("Number of Articles")
+plt.title("Daily Publishing Frequency Over Time")
+plt.xticks(rotation=45)
+plt.grid()
+plt.show()
+
+### ---------------------- STEP 4: PUBLISHER ANALYSIS ---------------------- ###
+
+# Extract Domain Names from Publisher Emails (if applicable)
+def extract_domain(email):
+    if "@" in str(email):
+        return email.split("@")[-1]  # Extract domain after "@"
+    return "Unknown"
+
+df["publisher_domain"] = df["publisher"].apply(extract_domain)
+
+# Count Unique Domains
+domain_counts = df["publisher_domain"].value_counts()
+print("Publisher Domain Distribution:\n", domain_counts)
+
+plt.figure(figsize=(10, 5))
+domain_counts[:10].plot(kind="bar", color="skyblue")
+plt.xlabel("Publisher Domain")
+plt.ylabel("Number of Articles")
+plt.title("Top 10 Publishing Domains")
+plt.xticks(rotation=45)
+plt.show()
+
 
 
  
