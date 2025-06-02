@@ -1,6 +1,21 @@
+
+# Byte‑compiled / cache
 __pycache__/
-.ipynb_checkpoints
-.env
-/.vscode/
-*.pyc
-/data/
+*.py[cod]
+*.so
+
+# Virtual environments
+.venv/
+.env/
+
+# Jupyter checkpoints & data
+.ipynb_checkpoints/
+data/
+*.csv
+
+# VSCode settings
+.vscode/
+# PyCharm settings
+.idea/
+# Logs
+*.log
