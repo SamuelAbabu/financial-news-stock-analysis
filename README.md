@@ -48,13 +48,9 @@ This analysis provides insights into news publication patterns, dominant sources
 
 ---
 
-## Future Work
-- Incorporate sentiment analysis to gauge market sentiment.
-- Extend topic modeling for dynamic trend detection.
-- Develop real-time alerts based on spike detection.
- ****-----------------------------***********
 
-Task 2: Quantitative analysis using pynance and TaLib
+
+## Task 2: Quantitative analysis using pynance and TaLib
 Overview
 This project focuses on quantitative stock price analysis and news sentiment correlation to understand financial market behavior. Using technical indicators and sentiment analysis, we aim to derive actionable insights into stock movements.
 
@@ -69,7 +65,7 @@ Leverage PyNance & TA-Lib for financial data analysis.
 
 Visualize findings using Matplotlib & Seaborn.
 
-Task 2: Quantitative Analysis using PyNance & TA-Lib
+## Task 2: Quantitative Analysis using PyNance & TA-Lib
 1️⃣ Load & Prepare Stock Data
 Ensure the dataset includes Date, Open, High, Low, Close, Volume.
 
@@ -97,7 +93,7 @@ Plot stock prices alongside technical indicators.
 Use line graphs to illustrate SMA & RSI trends.
 
 
- Task 3: Correlation between news and stock movement
+ ##  Task 3: Correlation between news and stock movement
      
 1️⃣ Normalize Dates
 Ensure both datasets align by normalizing timestamps.
