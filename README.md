@@ -48,9 +48,68 @@ This analysis provides insights into news publication patterns, dominant sources
 
 ---
 
-## Future Work
-- Incorporate sentiment analysis to gauge market sentiment.
-- Extend topic modeling for dynamic trend detection.
-- Develop real-time alerts based on spike detection.
- ****-----------------------------***********
 
+
+## Task 2: Quantitative analysis using pynance and TaLib
+Overview
+This project focuses on quantitative stock price analysis and news sentiment correlation to understand financial market behavior. Using technical indicators and sentiment analysis, we aim to derive actionable insights into stock movements.
+
+Objectives
+Utilize technical indicators to analyze stock trends.
+
+Apply sentiment analysis on financial news headlines.
+
+Establish correlations between news sentiment and stock price movements.
+
+Leverage PyNance & TA-Lib for financial data analysis.
+
+Visualize findings using Matplotlib & Seaborn.
+
+## Task 2: Quantitative Analysis using PyNance & TA-Lib
+1️⃣ Load & Prepare Stock Data
+Ensure the dataset includes Date, Open, High, Low, Close, Volume.
+
+Convert the date column to a standardized format.
+
+Set the date as the index to facilitate time-series analysis.
+
+2️⃣ Apply Technical Indicators using TA-Lib
+Install TA-Lib for financial analytics.
+
+Compute Moving Average (SMA) to identify stock trends.
+
+Calculate Relative Strength Index (RSI) to measure stock momentum.
+
+Derive MACD (Moving Average Convergence Divergence) for trend analysis.
+
+3️⃣ Financial Metrics with PyNance
+Install PyNance for financial data processing.
+
+Compute Bollinger Bands to analyze market volatility.
+
+4️⃣ Visualization of Technical Indicators
+Plot stock prices alongside technical indicators.
+
+Use line graphs to illustrate SMA & RSI trends.
+
+
+ ##  Task 3: Correlation between news and stock movement
+     
+1️⃣ Normalize Dates
+Ensure both datasets align by normalizing timestamps.
+
+Convert news article publication dates to match stock trading dates.
+
+2️⃣ Perform Sentiment Analysis
+Install NLTK for natural language processing.
+
+Use VADER Sentiment Analysis to quantify the tone of financial news headlines.
+
+3️⃣ Compute Daily Stock Returns
+Calculate the daily percentage change in stock closing prices.
+
+4️⃣ Merge Sentiment with Stock Data
+Integrate sentiment scores with stock price movements by aligning dates.
+
+5️⃣ Correlation Analysis
+Measure the relationship between news sentiment and stock price fluctuations using statistical correlation methods.
